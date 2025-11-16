@@ -37,7 +37,7 @@ Implements loose coupling between the system core and external side effects.
 Applies different operations to the entire fleet of vehicles, such as pricing evaluation and maintenance reporting.
 Adds new behaviors without modifying the vehicle classes.
 
-##Team Responsibilities
+## Team Responsibilities
 
 Nursultan:
 Abstract Factory, Decorator, Visitor.
