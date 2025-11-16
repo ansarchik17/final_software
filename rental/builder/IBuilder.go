@@ -1,7 +1,7 @@
 package builder
 
 import (
-	"final_software/rental/pricing/decorator"
+	"final_software/rental/pricing"
 	"final_software/rental/vehicle"
 )
 
@@ -11,6 +11,6 @@ type IRentalBuilder interface {
 	SetVehicle(car vehicle.IVehicle) IRentalBuilder
 	SetDays(days int) IRentalBuilder
 	SetPayment(method string) IRentalBuilder
-	SetPricer(price decorator.IPricer) IRentalBuilder
+	SetPricer(price pricing.IPricer) IRentalBuilder
 	Build() *RentalContract
 }

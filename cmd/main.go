@@ -3,112 +3,157 @@ package main
 import (
 	"fmt"
 
+	"final_software/rental/bridge"
 	"final_software/rental/builder"
 	"final_software/rental/factory"
 	"final_software/rental/observer/observer"
 	"final_software/rental/observer/subject"
+	"final_software/rental/pricing"
 	"final_software/rental/pricing/decorator"
 	"final_software/rental/vehicle"
 	"final_software/rental/visitorimpl"
 )
 
 func main() {
+	// Abstract Factory
+	cityBranchVehicleFactoryFromAbstractFactoryPattern := factory.NewCityBranchFactory()
+	airportBranchVehicleFactoryFromAbstractFactoryPattern := factory.NewAirportBranchFactory()
 
-	// ======================================================
-	// 1. OBSERVER SETUP
-	// ======================================================
-	fmt.Println("=== OBSERVER SETUP ===")
+	cityBranchEconomyVehicleFromAbstractFactoryPattern := cityBranchVehicleFactoryFromAbstractFactoryPattern.CreateEconomy()
+	cityBranchSuvVehicleFromAbstractFactoryPattern := cityBranchVehicleFactoryFromAbstractFactoryPattern.CreateSUV()
+	airportBranchEconomyVehicleFromAbstractFactoryPattern := airportBranchVehicleFactoryFromAbstractFactoryPattern.CreateEconomy()
+	airportBranchSuvVehicleFromAbstractFactoryPattern := airportBranchVehicleFactoryFromAbstractFactoryPattern.CreateSUV()
 
-	events := subject.NewSubject()
-	events.Register(&observer.AuditLogger{})
-	events.Register(&observer.EmailNotifier{Email: "client@example.com"})
+	fmt.Println("===== Abstract Factory: vehicles created for different rental branches =====")
+	printVehicleDetailsFromAbstractFactoryPattern := func(branchNameForVehicleFromAbstractFactoryPattern string, createdVehicleFromAbstractFactoryPattern vehicle.IVehicle) {
+		fmt.Printf(
+			"Branch=%s, VehicleType=%s, DailyBasePrice=%d\n",
+			branchNameForVehicleFromAbstractFactoryPattern,
+			createdVehicleFromAbstractFactoryPattern.TypeName(),
+			createdVehicleFromAbstractFactoryPattern.DailyBasePrice(),
+		)
+	}
 
-	fmt.Println("Observers registered.\n")
+	printVehicleDetailsFromAbstractFactoryPattern("City branch (Economy)", cityBranchEconomyVehicleFromAbstractFactoryPattern)
+	printVehicleDetailsFromAbstractFactoryPattern("City branch (SUV)", cityBranchSuvVehicleFromAbstractFactoryPattern)
+	printVehicleDetailsFromAbstractFactoryPattern("Airport branch (Economy)", airportBranchEconomyVehicleFromAbstractFactoryPattern)
+	printVehicleDetailsFromAbstractFactoryPattern("Airport branch (SUV)", airportBranchSuvVehicleFromAbstractFactoryPattern)
 
-	// ======================================================
-	// 2. FACTORY – CREATE VEHICLE
-	// ======================================================
-	fmt.Println("=== FACTORY DEMO ===")
+	// Bridge
+	fmt.Println()
+	fmt.Println("===== Bridge: base pricing for city economy car =====")
 
-	var cityFactory factory.IVehicleFactory = factory.NewCityBranchFactory()
-	car := cityFactory.CreateEconomy()
+	cityBranchEconomyVehiclePricingStrategyFromBridgePattern := bridge.NewVehiclePricing(cityBranchEconomyVehicleFromAbstractFactoryPattern)
+	cityBranchEconomyVehicleBridgePricerFromBridgePattern := bridge.NewBridgePricer(
+		cityBranchEconomyVehicleFromAbstractFactoryPattern.TypeName(),
+		cityBranchEconomyVehiclePricingStrategyFromBridgePattern,
+	)
 
-	fmt.Println("Factory produced:", car.TypeName(), "price/day:", car.DailyBasePrice())
+	totalRentalDaysForPricingDemonstrationFromBridgeAndDecoratorPatterns := 3
 
-	// ======================================================
-	// 3. BUILDER + BRIDGE + DECORATORS
-	// ======================================================
-	fmt.Println("\n=== BUILDER + BRIDGE + DECORATOR DEMO ===")
+	fmt.Printf(
+		"Base pricing from Bridge pattern for %d days: %d ₸ (%s)\n",
+		totalRentalDaysForPricingDemonstrationFromBridgeAndDecoratorPatterns,
+		cityBranchEconomyVehicleBridgePricerFromBridgePattern.Price(totalRentalDaysForPricingDemonstrationFromBridgeAndDecoratorPatterns),
+		cityBranchEconomyVehicleBridgePricerFromBridgePattern.Explain(),
+	)
 
-	rb := builder.NewRentalBuilder(events)
+	// Decorator
+	fmt.Println()
+	fmt.Println("===== Decorator: add-ons for city economy car pricing =====")
 
-	// Step-by-step contract creation using Builder
-	rb.SetClient("Ansar").
-		SetBranch("City Branch").
-		SetVehicle(car). // Bridge pricer is attached automatically
-		SetDays(3).
-		SetPayment("Card")
+	var decoratedVehiclePricerForCityBranchEconomyCarFromDecoratorPattern pricing.IPricer = cityBranchEconomyVehicleBridgePricerFromBridgePattern
+	decoratedVehiclePricerForCityBranchEconomyCarFromDecoratorPattern = decorator.NewInsurancePricer(decoratedVehiclePricerForCityBranchEconomyCarFromDecoratorPattern, 2000)
+	decoratedVehiclePricerForCityBranchEconomyCarFromDecoratorPattern = decorator.NewGpsPricer(decoratedVehiclePricerForCityBranchEconomyCarFromDecoratorPattern, 500)
+	decoratedVehiclePricerForCityBranchEconomyCarFromDecoratorPattern = decorator.NewChildSeatPricer(decoratedVehiclePricerForCityBranchEconomyCarFromDecoratorPattern, 1000)
 
-	// Now wrap with Decorators (your friend's part)
-	basePricer := rb.Build().Pricer // builder initially set BridgePricer
+	fmt.Printf(
+		"Pricing explanation from Decorator pattern: %s\n",
+		decoratedVehiclePricerForCityBranchEconomyCarFromDecoratorPattern.Explain(),
+	)
+	fmt.Printf(
+		"Total price for %d days from Bridge and Decorator patterns combined: %d ₸\n",
+		totalRentalDaysForPricingDemonstrationFromBridgeAndDecoratorPatterns,
+		decoratedVehiclePricerForCityBranchEconomyCarFromDecoratorPattern.Price(totalRentalDaysForPricingDemonstrationFromBridgeAndDecoratorPatterns),
+	)
 
-	// Rebuild builder again with updated pricer
-	rb = builder.NewRentalBuilder(events)
-	contract := rb.
-		SetClient("Ansar").
-		SetBranch("City Branch").
-		SetVehicle(car).
-		SetDays(3).
-		SetPayment("Card").
-		SetPricer(
-			decorator.NewGpsPricer(
-				decorator.NewChildSeatPricer(
-					decorator.NewInsurancePricer(
-						basePricer, 2000), // insurance
-					1000), // child seat
-				1500), // GPS
-		).
+	// Observer
+	fmt.Println()
+	fmt.Println("===== Observer: observers attached to rental events subject =====")
+
+	rentalEventSubjectForObserverPattern := subject.NewSubject()
+
+	emailNotifierObserverForRentalEventsFromObserverPattern := &observer.EmailNotifier{Email: "customer@example.com"}
+	auditLoggerObserverForRentalEventsFromObserverPattern := &observer.AuditLogger{}
+
+	rentalEventSubjectForObserverPattern.Register(emailNotifierObserverForRentalEventsFromObserverPattern)
+	rentalEventSubjectForObserverPattern.Register(auditLoggerObserverForRentalEventsFromObserverPattern)
+
+	rentalEventSubjectForObserverPattern.Notify("Initial system startup event before Builder pattern usage")
+
+	// Builder
+	fmt.Println()
+	fmt.Println("===== Builder: rental contract assembled with integrated Bridge, Decorator and Observer =====")
+
+	rentalContractBuilderWithObserverAndBridgeAndDecoratorPatterns := builder.NewRentalBuilder(rentalEventSubjectForObserverPattern)
+
+	rentalContractBuiltByBuilderPatternWithDecoratedPricer := rentalContractBuilderWithObserverAndBridgeAndDecoratorPatterns.
+		SetClient("Sample Customer From Builder Pattern").
+		SetBranch("City branch from Builder Pattern").
+		SetVehicle(cityBranchEconomyVehicleFromAbstractFactoryPattern).
+		SetDays(totalRentalDaysForPricingDemonstrationFromBridgeAndDecoratorPatterns).
+		SetPayment("Card payment from Builder Pattern").
+		SetPricer(decoratedVehiclePricerForCityBranchEconomyCarFromDecoratorPattern).
 		Build()
 
-	// Output final contract
-	fmt.Println("Contract created:")
-	fmt.Println(" Client:", contract.ClientName)
-	fmt.Println(" Car:", contract.Vehicle.TypeName())
-	fmt.Println(" Days:", contract.Days)
-	fmt.Println(" Payment:", contract.PaymentType)
-	fmt.Println(" Price explanation:", contract.Pricer.Explain())
-	fmt.Println(" Total:", contract.TotalPrice, "₸")
+	fmt.Printf(
+		"Rental contract built by Builder pattern (with Bridge and Decorator inside): %+v\n",
+		rentalContractBuiltByBuilderPatternWithDecoratedPricer,
+	)
 
-	// ======================================================
-	// 4. VISITOR – ADMIN ANALYSIS
-	// ======================================================
-	fmt.Println("\n=== VISITOR DEMO ===")
+	rentalEventSubjectForObserverPattern.Notify("Rental contract fully processed after Builder pattern usage")
 
-	fleet := []vehicle.IVisitable{
-		&vehicle.EconomyCar{DailyBase: 10000, Seats: 4},
-		&vehicle.SuvCar{DailyBase: 20000, Awd: true},
+	// Visitor
+	fmt.Println()
+	fmt.Println("===== Visitor: pricing and maintenance visitors over entire vehicle fleet =====")
+
+	totalRentalDaysForVisitorPricingDemonstrationFromVisitorPattern := 5
+	pricingVisitorForEntireVehicleFleetFromVisitorPattern := visitorimpl.NewPricingVisitor(totalRentalDaysForVisitorPricingDemonstrationFromVisitorPattern)
+	maintenanceVisitorForEntireVehicleFleetFromVisitorPattern := visitorimpl.NewMaintenanceVisitor()
+
+	visitableVehiclesForVisitorPattern := []vehicle.IVisitable{}
+
+	if visitableCityBranchEconomyVehicleFromVisitorPattern, ok := cityBranchEconomyVehicleFromAbstractFactoryPattern.(vehicle.IVisitable); ok {
+		visitableVehiclesForVisitorPattern = append(visitableVehiclesForVisitorPattern, visitableCityBranchEconomyVehicleFromVisitorPattern)
+	}
+	if visitableCityBranchSuvVehicleFromVisitorPattern, ok := cityBranchSuvVehicleFromAbstractFactoryPattern.(vehicle.IVisitable); ok {
+		visitableVehiclesForVisitorPattern = append(visitableVehiclesForVisitorPattern, visitableCityBranchSuvVehicleFromVisitorPattern)
+	}
+	if visitableAirportBranchEconomyVehicleFromVisitorPattern, ok := airportBranchEconomyVehicleFromAbstractFactoryPattern.(vehicle.IVisitable); ok {
+		visitableVehiclesForVisitorPattern = append(visitableVehiclesForVisitorPattern, visitableAirportBranchEconomyVehicleFromVisitorPattern)
+	}
+	if visitableAirportBranchSuvVehicleFromVisitorPattern, ok := airportBranchSuvVehicleFromAbstractFactoryPattern.(vehicle.IVisitable); ok {
+		visitableVehiclesForVisitorPattern = append(visitableVehiclesForVisitorPattern, visitableAirportBranchSuvVehicleFromVisitorPattern)
 	}
 
-	// Pricing Visitor
-	priceVisitor := visitorimpl.NewPricingVisitor(3)
-	for _, car := range fleet {
-		car.Accept(priceVisitor)
+	for _, visitableVehicleFromEntireFleetForVisitorPattern := range visitableVehiclesForVisitorPattern {
+		visitableVehicleFromEntireFleetForVisitorPattern.Accept(pricingVisitorForEntireVehicleFleetFromVisitorPattern)
+		visitableVehicleFromEntireFleetForVisitorPattern.Accept(maintenanceVisitorForEntireVehicleFleetFromVisitorPattern)
 	}
 
-	fmt.Println("Pricing Analysis:")
-	for _, note := range priceVisitor.Notes {
-		fmt.Println(" -", note)
-	}
-	fmt.Println("Total potential:", priceVisitor.Total, "₸")
+	fmt.Printf(
+		"Visitor pricing total for %d days over entire vehicle fleet: %d ₸\n",
+		totalRentalDaysForVisitorPricingDemonstrationFromVisitorPattern,
+		pricingVisitorForEntireVehicleFleetFromVisitorPattern.Total,
+	)
 
-	// Maintenance Visitor
-	maintVisitor := visitorimpl.NewMaintenanceVisitor()
-	for _, car := range fleet {
-		car.Accept(maintVisitor)
+	fmt.Println("Visitor pricing notes for entire vehicle fleet from Visitor pattern:")
+	for _, pricingNoteFromVisitorForEntireVehicleFleet := range pricingVisitorForEntireVehicleFleetFromVisitorPattern.Notes {
+		fmt.Println(" -", pricingNoteFromVisitorForEntireVehicleFleet)
 	}
 
-	fmt.Println("\nMaintenance Report:")
-	for _, line := range maintVisitor.Report {
-		fmt.Println(" -", line)
+	fmt.Println("Visitor maintenance report for entire vehicle fleet from Visitor pattern:")
+	for _, maintenanceReportLineFromVisitorForEntireVehicleFleet := range maintenanceVisitorForEntireVehicleFleetFromVisitorPattern.Report {
+		fmt.Println(" -", maintenanceReportLineFromVisitorForEntireVehicleFleet)
 	}
 }

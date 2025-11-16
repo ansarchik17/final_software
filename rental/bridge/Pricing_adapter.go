@@ -1,8 +1,9 @@
 package bridge
 
 import (
-	"final_software/rental/pricing/decorator"
 	"fmt"
+
+	"final_software/rental/pricing"
 )
 
 type BridgePricer struct {
@@ -10,7 +11,7 @@ type BridgePricer struct {
 	strategy    IPricingStrategy
 }
 
-var _ decorator.IPricer = (*BridgePricer)(nil)
+var _ pricing.IPricer = (*BridgePricer)(nil)
 
 func NewBridgePricer(name string, s IPricingStrategy) *BridgePricer {
 	return &BridgePricer{

@@ -1,15 +1,19 @@
 package decorator
 
-import "fmt"
+import (
+	"fmt"
+
+	"final_software/rental/pricing"
+)
 
 type InsurancePricer struct {
-	inner     IPricer
+	inner     pricing.IPricer
 	feePerDay int
 }
 
-var _ IPricer = (*InsurancePricer)(nil)
+var _ pricing.IPricer = (*InsurancePricer)(nil)
 
-func NewInsurancePricer(inner IPricer, fee int) *InsurancePricer {
+func NewInsurancePricer(inner pricing.IPricer, fee int) *InsurancePricer {
 	return &InsurancePricer{inner: inner, feePerDay: fee}
 }
 

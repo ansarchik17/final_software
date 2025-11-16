@@ -3,7 +3,7 @@ package builder
 import (
 	"final_software/rental/bridge"
 	"final_software/rental/observer/subject"
-	"final_software/rental/pricing/decorator"
+	"final_software/rental/pricing"
 	"final_software/rental/vehicle"
 )
 
@@ -37,7 +37,6 @@ func (b *RentalBuilder) SetVehicle(car vehicle.IVehicle) IRentalBuilder {
 	// Create Bridge strategy
 	strategy := bridge.NewVehiclePricing(car)
 
-	// Create initial pricer (Bridge → Decorator adapter)
 	b.contract.Pricer = bridge.NewBridgePricer(car.TypeName(), strategy)
 
 	return b
@@ -53,7 +52,7 @@ func (b *RentalBuilder) SetPayment(method string) IRentalBuilder {
 	return b
 }
 
-func (b *RentalBuilder) SetPricer(p decorator.IPricer) IRentalBuilder {
+func (b *RentalBuilder) SetPricer(p pricing.IPricer) IRentalBuilder {
 	b.contract.Pricer = p
 	return b
 }

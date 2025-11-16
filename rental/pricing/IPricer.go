@@ -1,4 +1,4 @@
-package decorator
+package pricing
 
 type IPricer interface {
 	Price(days int) int
