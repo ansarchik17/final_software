@@ -10,14 +10,14 @@ var (
 	_ IVisitable = (*EconomyCar)(nil)
 )
 
-func (c *EconomyCar) TypeName() string {
+func (car *EconomyCar) TypeName() string {
 	return "EconomyCar"
 }
 
-func (c *EconomyCar) DailyBasePrice() int {
-	return c.DailyBase
+func (car *EconomyCar) DailyBasePrice() int {
+	return car.DailyBase
 }
 
-func (c *EconomyCar) Accept(v IVisitor) {
-	v.VisitEconomy(c)
+func (car *EconomyCar) Accept(v IVisitor) {
+	v.VisitEconomy(car)
 }

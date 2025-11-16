@@ -17,10 +17,11 @@ func NewBasePricer(name string, base int) *BasePricer {
 	}
 }
 
-func (p *BasePricer) Price(days int) int {
-	return days * p.DailyBase
+func (basePrice *BasePricer) Price(days int) int {
+	baseprice := days * basePrice.DailyBase
+	return baseprice
 }
 
-func (p *BasePricer) Explain() string {
-	return fmt.Sprintf("%s: %d ₸/day", p.VehicleName, p.DailyBase)
+func (basePrice *BasePricer) Explain() string {
+	return fmt.Sprintf("%s: %d ₸/day", basePrice.VehicleName, basePrice.DailyBase)
 }

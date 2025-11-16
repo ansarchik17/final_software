@@ -13,10 +13,11 @@ func NewGpsPricer(inner IPricer, fee int) *GpsPricer {
 	return &GpsPricer{inner: inner, feePerDay: fee}
 }
 
-func (p *GpsPricer) Price(days int) int {
-	return p.inner.Price(days) + days*p.feePerDay
+func (gpsPrice *GpsPricer) Price(days int) int {
+	gpsTotalPrice := gpsPrice.inner.Price(days) + days*gpsPrice.feePerDay
+	return gpsTotalPrice
 }
 
-func (p *GpsPricer) Explain() string {
-	return p.inner.Explain() + fmt.Sprintf(" + GPS %d ₸/day", p.feePerDay)
+func (gpsPrice *GpsPricer) Explain() string {
+	return gpsPrice.inner.Explain() + fmt.Sprintf(" + GPS %d ₸/day", gpsPrice.feePerDay)
 }

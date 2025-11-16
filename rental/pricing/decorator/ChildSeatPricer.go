@@ -13,10 +13,11 @@ func NewChildSeatPricer(inner IPricer, fee int) *ChildSeatPricer {
 	return &ChildSeatPricer{inner: inner, feePerDay: fee}
 }
 
-func (p *ChildSeatPricer) Price(days int) int {
-	return p.inner.Price(days) + days*p.feePerDay
+func (childSeatPrice *ChildSeatPricer) Price(days int) int {
+	totalChildSeatPrice := childSeatPrice.inner.Price(days) + days*childSeatPrice.feePerDay
+	return totalChildSeatPrice
 }
 
-func (p *ChildSeatPricer) Explain() string {
-	return p.inner.Explain() + fmt.Sprintf(" + child seat %d ₸/day", p.feePerDay)
+func (childSeatPrice *ChildSeatPricer) Explain() string {
+	return childSeatPrice.inner.Explain() + fmt.Sprintf(" + child seat %d ₸/day", childSeatPrice.feePerDay)
 }

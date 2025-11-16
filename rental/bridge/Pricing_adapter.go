@@ -19,10 +19,10 @@ func NewBridgePricer(name string, s IPricingStrategy) *BridgePricer {
 	}
 }
 
-func (p *BridgePricer) Price(days int) int {
-	return p.strategy.BasePricePerDay() * days
+func (price *BridgePricer) Price(days int) int {
+	return price.strategy.BasePricePerDay() * days
 }
 
-func (p *BridgePricer) Explain() string {
-	return fmt.Sprintf("%s: %d ₸/day", p.vehicleName, p.strategy.BasePricePerDay())
+func (price *BridgePricer) Explain() string {
+	return fmt.Sprintf("%s: %d ₸/day", price.vehicleName, price.strategy.BasePricePerDay())
 }

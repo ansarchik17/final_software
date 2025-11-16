@@ -13,10 +13,11 @@ func NewInsurancePricer(inner IPricer, fee int) *InsurancePricer {
 	return &InsurancePricer{inner: inner, feePerDay: fee}
 }
 
-func (p *InsurancePricer) Price(days int) int {
-	return p.inner.Price(days) + days*p.feePerDay
+func (price *InsurancePricer) Price(days int) int {
+	insurancePrice := price.inner.Price(days) + days*price.feePerDay
+	return insurancePrice
 }
 
-func (p *InsurancePricer) Explain() string {
-	return p.inner.Explain() + fmt.Sprintf(" + insurance %d ₸/day", p.feePerDay)
+func (price *InsurancePricer) Explain() string {
+	return price.inner.Explain() + fmt.Sprintf(" + insurance %d ₸/day", price.feePerDay)
 }

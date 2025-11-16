@@ -12,6 +12,6 @@ func NewVehiclePricing(car vehicle.IVehicle) *VehiclePricingStrategy {
 	return &VehiclePricingStrategy{car: car}
 }
 
-func (v *VehiclePricingStrategy) BasePricePerDay() int {
-	return v.car.DailyBasePrice()
+func (vehicle *VehiclePricingStrategy) BasePricePerDay() int {
+	return vehicle.car.DailyBasePrice()
 }

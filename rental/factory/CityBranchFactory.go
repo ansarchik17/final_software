@@ -10,14 +10,14 @@ func NewCityBranchFactory() *CityBranchFactory {
 
 var _ IVehicleFactory = (*CityBranchFactory)(nil)
 
-func (f *CityBranchFactory) CreateEconomy() vehicle.IVehicle {
+func (factory *CityBranchFactory) CreateEconomy() vehicle.IVehicle {
 	return &vehicle.EconomyCar{
 		DailyBase: 10000,
 		Seats:     4,
 	}
 }
 
-func (f *CityBranchFactory) CreateSUV() vehicle.IVehicle {
+func (factory *CityBranchFactory) CreateSUV() vehicle.IVehicle {
 	return &vehicle.SuvCar{
 		DailyBase: 20000,
 		Awd:       false,

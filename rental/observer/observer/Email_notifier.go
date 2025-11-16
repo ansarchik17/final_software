@@ -8,6 +8,6 @@ type EmailNotifier struct {
 
 var _ IObserver = (*EmailNotifier)(nil)
 
-func (e *EmailNotifier) Update(event string) {
-	fmt.Printf("[EMAIL to %s] %s\n", e.Email, event)
+func (emailNotifier *EmailNotifier) Update(event string) {
+	fmt.Printf("[EMAIL to %s] %s\n", emailNotifier.Email, event)
 }

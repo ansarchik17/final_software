@@ -12,12 +12,12 @@ func NewSubject() *Subject {
 	return &Subject{}
 }
 
-func (s *Subject) Register(o observer.IObserver) {
-	s.obs = append(s.obs, o)
+func (subject *Subject) Register(o observer.IObserver) {
+	subject.obs = append(subject.obs, o)
 }
 
-func (s *Subject) Notify(event string) {
-	for _, o := range s.obs {
+func (subject *Subject) Notify(event string) {
+	for _, o := range subject.obs {
 		o.Update(event)
 	}
 }

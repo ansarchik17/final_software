@@ -16,17 +16,17 @@ func NewMaintenanceVisitor() *MaintenanceVisitor {
 	return &MaintenanceVisitor{}
 }
 
-func (v *MaintenanceVisitor) VisitEconomy(c *vehicle.EconomyCar) {
-	v.Report = append(v.Report,
+func (visit *MaintenanceVisitor) VisitEconomy(c *vehicle.EconomyCar) {
+	visit.Report = append(visit.Report,
 		fmt.Sprintf("EconomyCar: check engine, tires, interior (seats=%d)", c.Seats))
 }
 
-func (v *MaintenanceVisitor) VisitSuv(c *vehicle.SuvCar) {
+func (visit *MaintenanceVisitor) VisitSuv(c *vehicle.SuvCar) {
 	task := "standard check"
 	if c.Awd {
 		task = "AWD drivetrain check + standard check"
 	}
 
-	v.Report = append(v.Report,
+	visit.Report = append(visit.Report,
 		fmt.Sprintf("SUV: %s", task))
 }

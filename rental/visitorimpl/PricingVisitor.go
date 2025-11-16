@@ -18,20 +18,20 @@ func NewPricingVisitor(days int) *PricingVisitor {
 	return &PricingVisitor{Days: days}
 }
 
-func (v *PricingVisitor) VisitEconomy(c *vehicle.EconomyCar) {
-	price := v.Days * c.DailyBase
-	v.Total += price
-	v.Notes = append(v.Notes,
-		fmt.Sprintf("Economy × %d days = %d ₸", v.Days, price))
+func (visit *PricingVisitor) VisitEconomy(c *vehicle.EconomyCar) {
+	price := visit.Days * c.DailyBase
+	visit.Total += price
+	visit.Notes = append(visit.Notes,
+		fmt.Sprintf("Economy × %d days = %d ₸", visit.Days, price))
 }
 
-func (v *PricingVisitor) VisitSuv(c *vehicle.SuvCar) {
-	base := v.Days * c.DailyBase
+func (visit *PricingVisitor) VisitSuv(c *vehicle.SuvCar) {
+	base := visit.Days * c.DailyBase
 	if c.Awd {
 		base = int(float64(base) * 1.10)
 	}
 
-	v.Total += base
-	v.Notes = append(v.Notes,
-		fmt.Sprintf("SUV × %d days (AWD=%v) = %d ₸", v.Days, c.Awd, base))
+	visit.Total += base
+	visit.Notes = append(visit.Notes,
+		fmt.Sprintf("SUV × %d days (AWD=%v) = %d ₸", visit.Days, c.Awd, base))
 }
