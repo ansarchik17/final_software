@@ -18,6 +18,6 @@ func (car *SuvCar) DailyBasePrice() int {
 	return car.DailyBase
 }
 
-func (car *SuvCar) Accept(v IVisitor) {
-	v.VisitSuv(car)
+func (car *SuvCar) Accept(visit IVisitor) {
+	visit.VisitSuv(car)
 }
